@@ -1,0 +1,11 @@
+{
+  "name": "mushroom_app",
+  "version": "1.0.0",
+  "description": "for Loginom",
+  "main": "index.js",
+  "scripts": {
+    "clusterize-data": "node index.js"
+  },
+  "author": "Anvar Khakimov",
+  "license": "ISC"
+}
