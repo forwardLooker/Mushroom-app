@@ -15,7 +15,7 @@ module.exports = class Cluster {
 
   static clusters = [];
 
-  static transactionIndexes = {};
+  static transactionIndexes = {}; //trIndex(number): cluster(Cluster)
 
   constructor({id}) {
     this.id = id;
@@ -69,7 +69,7 @@ module.exports = class Cluster {
     }
   }
   
-  addTransaction(tr, trIndex) {
+  addTransaction(tr, trIndex, {moved}) {
     try {
       if (this.N === 0) {
         fs.writeFileSync(`cluster${this.id}.data`, tr);
@@ -81,8 +81,10 @@ module.exports = class Cluster {
           this.Occ[idx + o] = 1;
         });
         this.W = Object.keys(this.Occ).length;
-
-        Cluster.sumN++;
+        
+        if (!moved) {
+          Cluster.sumN++;
+        }
 
         Cluster.transactionIndexes[trIndex] = this;
       } else {
@@ -100,13 +102,46 @@ module.exports = class Cluster {
         });
         this.W = Object.keys(this.Occ).length;
 
-        Cluster.sumN++;
+        if (!moved) {
+          Cluster.sumN++;
+        }
 
         Cluster.transactionIndexes[trIndex] = this;
+
+        if (moved) {
+          console.log(`transaction(${tr}) moved to cluster${this.id}.data`)
+        }
       }
     } catch (err) {
       console.error(err);
     }
 
+  }
+
+  deleteTransaction(tr) {
+    fs.readFile(`./cluster${this.id}.data`, 'utf-8', function(err, data) {
+      if (err) throw err;
+
+      var newValue = data.replace(tr + '\r\n', '');
+
+      fs.writeFile(`./cluster${this.id}.data`, newValue, 'utf-8', function(err) {
+        if (err) throw err;
+        console.log(`transaction(${tr}) deleted from cluster${this.id}.data`);
+      });
+    });
+
+
+    this.N--;
+    this.S = this.N * Cluster.TRANSACTION_LENGTH;
+
+    const trArr = tr.split(',');
+    trArr.forEach((o, idx) => {
+      if (this.Occ[idx + o] > 1) {
+        this.Occ[idx + o] = this.Occ[idx + o] - 1;
+      } else {
+        delete this.Occ[idx + o];
+      }
+    });
+    this.W = Object.keys(this.Occ).length;
   }
 }

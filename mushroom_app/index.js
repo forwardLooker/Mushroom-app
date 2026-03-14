@@ -50,8 +50,40 @@ rl.on('line', (line) => {
   
 });
 
+do {
+  let moved = false;
+
+  lineIdx = 0;
+
+  rl.on('line', (line) => {
+    lineIdx++;
+
+    const currentCluster = Cluster.transactionIndexes[lineIdx];
+    const currentClusterProfit = currentCluster.calcProfit();
+
+    let profitMax = 0;
+    let clusterWithMaxProfit;
+
+    Cluster.clusters.forEach(cluster => {
+      if (cluster !== currentCluster) {
+        const profit = cluster.calcProfit(line);
+        if (profit > profitMax) {
+          profitMax = profit;
+          clusterWithMaxProfit = cluster;
+        }
+      }
+    });
+
+    if (profitMax > currentClusterProfit) {
+      currentCluster.deleteTransaction(line);  
+      clusterWithMaxProfit.addTransaction(line, lineIdx, {moved: true});
+      moved = true;
+    }
+
+  });
+} while (moved === true)
+
 
 lineIdx = 0;
-
 
 // Cluster 
