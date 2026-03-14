@@ -4,22 +4,14 @@ const readline = require('readline');
 
 const { once } = require('events');
 
-// const rl = readline.createInterface({
-//   input: fs.createReadStream('agaricus-lepiota.data'),
-//   crlfDelay: Infinity // Treats '\r\n' as a single newline
-// });
-    // let tr = 'p,x,s,n,t,p,f,c,n,k,e,e,s,s,w,w,p,w,o,p,k,s,u'
-    // let data = fs.readFileSync(`cluster${1}.data`, 'utf8');
-    // let newValue = data.replace(tr, 'changed');
-
-    // fs.writeFileSync(`cluster${1}.data`, newValue);
-
 
 (async function Main() {
   console.log('processInitPhaseLineByLine started');
   await processInitPhaseLineByLine();
+
   console.log('processIterationPhaseLineByLine started');
   await processIterationPhaseLineByLine();
+
   console.log('Clusterization finished');
 })()
 
@@ -35,39 +27,34 @@ async function processInitPhaseLineByLine() {
 
     rl.on('line', (line) => {
       
-      // console.log(`Line from file: ${line}`);
       lineIdx++;
 
       if (Cluster.clusters.length === 0) {
-        const cluster = new Cluster({id: 1});
+        const cluster = new Cluster();
         cluster.addTransaction(line, lineIdx);
-        Cluster.clusters.push(cluster);
-
 
       } else {
+
         const clusterProfitsArr = Cluster.clusters.map(cluster => {
           const profit = cluster.calcProfit(line);
           return {cluster, profit}
         });
+
         let profitMax = 0;
         let clusterWithMaxProfit;
 
-        clusterProfitsArr.forEach(clObj => {
-          if (clObj.profit > profitMax) {
-            profitMax = clObj.profit;
-            clusterWithMaxProfit = clObj.cluster;
+        clusterProfitsArr.forEach(clusterObj => {
+          if (clusterObj.profit > profitMax) {
+            profitMax = clusterObj.profit;
+            clusterWithMaxProfit = clusterObj.cluster;
           }
         });
 
         const profitForNewCluster = Cluster.calcProfitForNewCluster(line);
 
-        // console.log('profitForNewCluster', profitForNewCluster);
-        // console.log('profitMax', profitMax);
-
         if (profitForNewCluster > profitMax) {
-          const cluster = new Cluster({id: Cluster.clusters.length + 1});
+          const cluster = new Cluster();
           cluster.addTransaction(line, lineIdx);
-          Cluster.clusters.push(cluster);
         } else {
           clusterWithMaxProfit.addTransaction(line, lineIdx);
         }
@@ -86,10 +73,10 @@ async function processInitPhaseLineByLine() {
 // Phase 2
 async function processIterationPhaseLineByLine() {
   let moved;
-  let iteration = 0;
+  let iterationCount = 0;
   do {
     moved = false;
-    iteration++;
+    iterationCount++;
 
     let lineIdx = 0;
 
@@ -130,13 +117,13 @@ async function processIterationPhaseLineByLine() {
 
         await once(rl, 'close');
 
-        console.log(`File processed. processMoveLineByLine finished. Iteration №${iteration}`);
+        console.log(`File processed. processMoveLineByLine finished. Iteration №${iterationCount}`);
       } catch (err) {
         console.error(err);
       }
     };
 
-    console.log(`processMoveLineByLine started. Iteration №${iteration}`);
+    console.log(`processMoveLineByLine started. Iteration №${iterationCount}`);
     await processMoveLineByLine();
 
   } while (moved === true)

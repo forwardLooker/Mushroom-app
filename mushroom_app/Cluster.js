@@ -17,8 +17,9 @@ module.exports = class Cluster {
 
   static transactionIndexes = {}; //lineIdx(number): cluster(Cluster)
 
-  constructor({id}) {
-    this.id = id;
+  constructor() {
+    this.id = Cluster.clusters.length + 1;
+    Cluster.clusters.push(this);
   }
 
   static calcProfitForNewCluster(tr) {
