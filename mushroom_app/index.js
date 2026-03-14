@@ -13,6 +13,17 @@ const { once } = require('events');
   await processIterationPhaseLineByLine();
 
   console.log('Clusterization finished');
+
+  Cluster.clusters.forEach(cluster => {
+    const clustersFromIndexes = Object.values(Cluster.transactionIndexes);
+    if (!clustersFromIndexes.find(cl => cl === cluster)) {
+      fs.unlink(`cluster${cluster.id}.data`, (err) => {
+        if (err) throw err;
+        console.log(`Successfully deleted cluster${cluster.id}.data`);
+      });
+    }
+  })
+
 })()
 
 // Phase 1
