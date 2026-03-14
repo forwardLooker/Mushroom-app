@@ -6,10 +6,8 @@ const { once } = require('events');
 
 
 (async function Main() {
-  console.log('processInitPhaseLineByLine started');
-  await processInitPhaseLineByLine();
 
-  console.log('processIterationPhaseLineByLine started');
+  await processInitPhaseLineByLine();
   await processIterationPhaseLineByLine();
 
   console.log('Clusterization finished');
@@ -28,6 +26,7 @@ const { once } = require('events');
 
 // Phase 1
 async function processInitPhaseLineByLine() {
+  console.log('processInitPhaseLineByLine started');
   try {
     const rl = readline.createInterface({
       input: fs.createReadStream('agaricus-lepiota.data'),
@@ -83,6 +82,7 @@ async function processInitPhaseLineByLine() {
 
 // Phase 2
 async function processIterationPhaseLineByLine() {
+  console.log('processIterationPhaseLineByLine started');
   let moved;
   let iterationCount = 0;
   do {
@@ -92,6 +92,7 @@ async function processIterationPhaseLineByLine() {
     let lineIdx = 0;
 
     async function processMoveLineByLine() {
+      console.log(`processMoveLineByLine started. Iteration №${iterationCount}.`);
       try {
         const rl = readline.createInterface({
           input: fs.createReadStream('agaricus-lepiota.data'),
@@ -145,7 +146,6 @@ async function processIterationPhaseLineByLine() {
       }
     };
 
-    console.log(`processMoveLineByLine started. Iteration №${iterationCount}.`);
     await processMoveLineByLine();
 
   } while (moved === true)
