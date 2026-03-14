@@ -8,9 +8,17 @@ const { once } = require('events');
 //   input: fs.createReadStream('agaricus-lepiota.data'),
 //   crlfDelay: Infinity // Treats '\r\n' as a single newline
 // });
+    // let tr = 'p,x,s,n,t,p,f,c,n,k,e,e,s,s,w,w,p,w,o,p,k,s,u'
+    // let data = fs.readFileSync(`cluster${1}.data`, 'utf8');
+    // let newValue = data.replace(tr, 'changed');
+
+    // fs.writeFileSync(`cluster${1}.data`, newValue);
+
 
 (async function Main() {
+  console.log('processInitPhaseLineByLine started');
   await processInitPhaseLineByLine();
+  console.log('processIterationPhaseLineByLine started');
   await processIterationPhaseLineByLine();
   console.log('Clusterization finished');
 })()
@@ -69,7 +77,7 @@ async function processInitPhaseLineByLine() {
 
     await once(rl, 'close');
 
-    console.log('File processed. Init Phase.');
+    console.log('File processed. processInitPhaseLineByLine finished.');
   } catch (err) {
     console.error(err);
   }
@@ -122,12 +130,13 @@ async function processIterationPhaseLineByLine() {
 
         await once(rl, 'close');
 
-        console.log(`File processed. Iteration Phase. Iteration №${iteration}`);
+        console.log(`File processed. processMoveLineByLine finished. Iteration №${iteration}`);
       } catch (err) {
         console.error(err);
       }
     };
 
+    console.log(`processMoveLineByLine started. Iteration №${iteration}`);
     await processMoveLineByLine();
 
   } while (moved === true)

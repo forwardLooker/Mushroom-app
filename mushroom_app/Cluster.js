@@ -120,10 +120,10 @@ module.exports = class Cluster {
 
   deleteTransaction(tr) {
 
-    let data = fs.readFileSync(`./cluster${this.id}.data`);
-    let newValue = data.replace(tr + '\r\n', '');
+    let data = fs.readFileSync(`cluster${this.id}.data`, 'utf8');
+    let newValue = data.replace(tr, '');
 
-    fs.writeFileSync(`./cluster${this.id}.data`, newValue);
+    fs.writeFileSync(`cluster${this.id}.data`, newValue);
 
     console.log(`transaction(${tr}) deleted from cluster${this.id}.data`);
 
