@@ -146,6 +146,7 @@ module.exports = class Cluster {
 
     let data = fs.readFileSync(`cluster${this.id}.data`, 'utf8');
     let newValue = data.replace(tr, '');
+    newValue = newValue.replace('\r\n\r\n', '\r\n');
 
     fs.writeFileSync(`cluster${this.id}.data`, newValue);
 
