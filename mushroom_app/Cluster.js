@@ -15,7 +15,7 @@ module.exports = class Cluster {
 
   static clusters = [];
 
-  static transactionIndexes = {}; //trIndex(number): cluster(Cluster)
+  static transactionIndexes = {}; //lineIdx(number): cluster(Cluster)
 
   constructor({id}) {
     this.id = id;
@@ -69,7 +69,7 @@ module.exports = class Cluster {
     }
   }
   
-  addTransaction(tr, trIndex, {moved}) {
+  addTransaction(tr, trIndex, options = {}) {
     try {
       if (this.N === 0) {
         fs.writeFileSync(`cluster${this.id}.data`, tr);
@@ -82,7 +82,7 @@ module.exports = class Cluster {
         });
         this.W = Object.keys(this.Occ).length;
         
-        if (!moved) {
+        if (!options.moved) {
           Cluster.sumN++;
         }
 
@@ -102,13 +102,13 @@ module.exports = class Cluster {
         });
         this.W = Object.keys(this.Occ).length;
 
-        if (!moved) {
+        if (!options.moved) {
           Cluster.sumN++;
         }
 
         Cluster.transactionIndexes[trIndex] = this;
 
-        if (moved) {
+        if (options.moved) {
           console.log(`transaction(${tr}) moved to cluster${this.id}.data`)
         }
       }
