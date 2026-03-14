@@ -119,17 +119,13 @@ module.exports = class Cluster {
   }
 
   deleteTransaction(tr) {
-    fs.readFile(`./cluster${this.id}.data`, 'utf-8', function(err, data) {
-      if (err) throw err;
 
-      var newValue = data.replace(tr + '\r\n', '');
+    let data = fs.readFileSync(`./cluster${this.id}.data`);
+    let newValue = data.replace(tr + '\r\n', '');
 
-      fs.writeFile(`./cluster${this.id}.data`, newValue, 'utf-8', function(err) {
-        if (err) throw err;
-        console.log(`transaction(${tr}) deleted from cluster${this.id}.data`);
-      });
-    });
+    fs.writeFileSync(`./cluster${this.id}.data`, newValue);
 
+    console.log(`transaction(${tr}) deleted from cluster${this.id}.data`);
 
     this.N--;
     this.S = this.N * Cluster.TRANSACTION_LENGTH;
