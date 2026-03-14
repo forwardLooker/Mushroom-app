@@ -32,21 +32,44 @@ module.exports = class Cluster {
 
   }
 
-  calcProfit(tr) {
-    const profit = ((this.sumGradientFromOtherClusters + this.getGradient(tr))) / Cluster.sumN;
+  calcProfit(tr, whenMoveData) {
+    const profit = ((this.sumGradientFromOtherClusters(tr, whenMoveData) + this.getGradient(tr))) / Cluster.sumN;
     return profit;
   }
 
-  get sumGradientFromOtherClusters() {
+  sumGradientFromOtherClusters(tr, whenMoveData) {
     const otherClusters = Cluster.clusters.filter(cl => cl.id !== this.id);
     let sumGradient = 0;
     otherClusters.forEach(cl => {
-      sumGradient = sumGradient + cl.getGradient();
+      if (whenMoveData && whenMoveData.sourceCluster === cl) {
+        sumGradient = sumGradient + cl.getGradient(tr, {withoutTransaction: true})
+      } else {
+        sumGradient = sumGradient + cl.getGradient();
+      }
     });
     return sumGradient;
   };
 
-  getGradient(tr) {
+  getGradient(tr, options = {}) {
+    // For Iteration Phase
+    if (options.withoutTransaction && tr) {
+      const newS = this.S - Cluster.TRANSACTION_LENGTH;
+      let newOcc = {...this.Occ};
+
+      const trArr = tr.split(',');
+      trArr.forEach((o, idx) => {
+        if (newOcc[idx + o] > 1) {
+          newOcc[idx + o] = newOcc[idx + o] - 1;
+        } else {
+          delete newOcc[idx + o];
+        }
+      });
+      const newW = Object.keys(newOcc).length;
+
+      const gradient = (newS / (Math.pow(newW, Cluster.r))) * (this.N - 1);
+      return gradient;
+    }
+    // For Init Phase
     if (!tr) {
       const gradient = (this.S / (Math.pow(this.W, Cluster.r))) * this.N;
       return gradient;

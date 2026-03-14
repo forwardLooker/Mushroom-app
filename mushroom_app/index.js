@@ -112,7 +112,7 @@ async function processIterationPhaseLineByLine() {
 
           Cluster.clusters.forEach(cluster => {
             if (cluster !== currentCluster) {
-              const profit = cluster.calcProfit(line);
+              const profit = cluster.calcProfit(line, {sourceCluster: currentCluster});
               if (profit > profitMax) {
                 profitMax = profit;
                 clusterWithMaxProfit = cluster;
