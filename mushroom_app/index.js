@@ -9,8 +9,8 @@ const { once } = require('events');
   console.log('processInitPhaseLineByLine started');
   await processInitPhaseLineByLine();
 
-  console.log('processIterationPhaseLineByLine started');
-  await processIterationPhaseLineByLine();
+  // console.log('processIterationPhaseLineByLine started');
+  // await processIterationPhaseLineByLine();
 
   console.log('Clusterization finished');
 
@@ -128,13 +128,13 @@ async function processIterationPhaseLineByLine() {
 
         await once(rl, 'close');
 
-        console.log(`File processed. processMoveLineByLine finished. Iteration №${iterationCount}`);
+        console.log(`Iteration №${iterationCount} File processed. processMoveLineByLine finished.`);
       } catch (err) {
         console.error(err);
       }
     };
 
-    console.log(`processMoveLineByLine started. Iteration №${iterationCount}`);
+    console.log(`processMoveLineByLine started. Iteration №${iterationCount}.`);
     await processMoveLineByLine();
 
   } while (moved === true)
