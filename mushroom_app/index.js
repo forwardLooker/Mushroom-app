@@ -9,8 +9,8 @@ const { once } = require('events');
   console.log('processInitPhaseLineByLine started');
   await processInitPhaseLineByLine();
 
-  // console.log('processIterationPhaseLineByLine started');
-  // await processIterationPhaseLineByLine();
+  console.log('processIterationPhaseLineByLine started');
+  await processIterationPhaseLineByLine();
 
   console.log('Clusterization finished');
 
