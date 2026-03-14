@@ -118,17 +118,28 @@ async function processIterationPhaseLineByLine() {
             }
           });
 
-          if (profitMax > currentClusterProfit) {
+          // На всякий случай. Если вдруг на Итерации выгодней создать новый Кластер.
+          const profitForNewCluster = Cluster.calcProfitForNewCluster(line, {sourceCluster: currentCluster});
+          if ((profitForNewCluster > profitMax) && (profitForNewCluster > currentClusterProfit)) {
+
+            currentCluster.deleteTransaction(line);  
+            const cluster = new Cluster();
+            cluster.addTransaction(line, lineIdx, {moved: true});
+          } else {
+
+            if (profitMax > currentClusterProfit) {
             currentCluster.deleteTransaction(line);  
             clusterWithMaxProfit.addTransaction(line, lineIdx, {moved: true});
             moved = true;
+          }
+
           }
 
         });
 
         await once(rl, 'close');
 
-        console.log(`Iteration №${iterationCount} File processed. processMoveLineByLine finished.`);
+        console.log(`Iteration №${iterationCount} File processed. processMoveLineByLine finished. moved=${moved}`);
       } catch (err) {
         console.error(err);
       }

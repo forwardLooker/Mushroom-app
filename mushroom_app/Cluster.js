@@ -22,10 +22,14 @@ module.exports = class Cluster {
     Cluster.clusters.push(this);
   }
 
-  static calcProfitForNewCluster(tr) {
+  static calcProfitForNewCluster(tr, whenMoveData) {
     let sumGradientFromOtherClusters = 0;
     Cluster.clusters.forEach(cl => {
-      sumGradientFromOtherClusters = sumGradientFromOtherClusters + cl.getGradient();
+      if (whenMoveData && whenMoveData.sourceCluster === cl) {
+        sumGradientFromOtherClusters = sumGradientFromOtherClusters + cl.getGradient(tr, {withoutTransaction: true});
+      } else {
+        sumGradientFromOtherClusters = sumGradientFromOtherClusters + cl.getGradient();
+      }
     });
 
     const profit = ((sumGradientFromOtherClusters + (Cluster.TRANSACTION_LENGTH / (Math.pow(Cluster.TRANSACTION_LENGTH, Cluster.r) )))) / Cluster.sumN;
